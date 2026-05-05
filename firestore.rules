@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /mementos/{mementoId} {
+      allow read: if true; // Publicly readable for the share page
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    match /memories/{memoryId} {
+      allow read: if true; // Publicly readable for the share page
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && exists(/databases/$(database)/documents/mementos/$(request.resource.data.mementoId)) && get(/databases/$(database)/documents/mementos/$(request.resource.data.mementoId)).data.userId == request.auth.uid;
+    }
+  }
+}
