@@ -57,7 +57,7 @@ export default function CreateMemento() {
       };
 
       const docRef = await addDoc(collection(db, 'mementos'), mementoData);
-      router.push(`/m/${docRef.id}`);
+      router.push(`/register?mementoId=${docRef.id}`);
     } catch (error) {
       console.error('Error creating memento:', error);
       alert('Failed to create memento. Please try again.');

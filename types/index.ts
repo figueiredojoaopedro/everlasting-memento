@@ -1,3 +1,5 @@
+export type MementoPlan = 'weekly' | 'yearly';
+
 export interface Memento {
   id: string;
   userId: string;
@@ -6,6 +8,8 @@ export interface Memento {
   date?: string;
   whoIsThisFor?: string;
   createdAt: number;
+  expiresAt?: number;
+  plan?: MementoPlan;
 }
 
 export interface Memory {

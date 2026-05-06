@@ -22,9 +22,12 @@ No overengineering. No unnecessary features.
 1. User lands on landing page
 2. Clicks **Create your memento**
 3. Creates memento (≤ 60 seconds)
-4. Lands on dashboard
-5. Adds at least 1 memory
-6. Shares the page
+4. Registers (email+password, upgrades from anonymous)
+5. Chooses plan (Weekly R$18.90 / Yearly R$29.90)
+6. Pays via AbacatePay (PIX or Card)
+7. Lands on dashboard with active plan
+8. Adds at least 1 memory
+9. Shares the page
 
 If this flow breaks → product fails
 
@@ -34,7 +37,9 @@ If this flow breaks → product fails
 
 - `/` → Landing
 - `/create` → Create memento
-- `/m/[id]` → Dashboard (private)
+- `/register?mementoId=` → Register (email+password, upgrade from anonymous)
+- `/plans?mementoId=` → Choose plan (Weekly R$18.90 / Yearly R$29.90)
+- `/m/[id]` → Dashboard (private, shows plan status / expiration)
 - `/m/[id]/new` → Add memory
 - `/view/[id]` → Public share page
 
@@ -162,9 +167,10 @@ This is NOT secondary → this drives growth
   - Firebase Storage
   - Firebase Auth
 
-### Payments (Later)
+### Payments
 
-- Stripe (not in MVP yet)
+- AbacatePay (PIX + Card)
+- Two one-time plans: Weekly (R$18.90) and Yearly (R$29.90)
 
 ---
 
@@ -177,13 +183,20 @@ everlasting-mementos/
 │   ├── page.tsx
 │   ├── layout.tsx
 │   ├── create/page.tsx
+│   ├── register/page.tsx
+│   ├── plans/page.tsx
 │   ├── m/[id]/page.tsx
 │   ├── m/[id]/new/page.tsx
 │   ├── view/[id]/page.tsx
-│   └── api/mementos/
+│   └── api/
+│       ├── checkout/route.ts
+│       └── webhooks/abacatepay/route.ts
 │
 ├── components/
 ├── lib/
+│   ├── firebase.ts
+│   ├── firebase-admin.ts
+│   └── abacatepay.ts
 ├── hooks/
 ├── types/
 ```
@@ -200,6 +213,8 @@ everlasting-mementos/
 - coverImageUrl
 - date
 - createdAt
+- expiresAt (timestamp, set after payment)
+- plan (null | "weekly" | "yearly")
 
 ### Memory
 
@@ -272,6 +287,13 @@ These will kill your speed
 
 - Timeline UI
 - Public page
+
+### 4
+
+- Registration flow (email+password, link anonymous)
+- AbacatePay integration (checkout, products, webhooks)
+- Plan selection + payment flow
+- Expiration logic on dashboard
 
 ---
 

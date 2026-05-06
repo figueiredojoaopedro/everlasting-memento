@@ -74,7 +74,8 @@ export default function Home() {
           <div className="pt-10">
             <Link
               href="/create"
-              className="inline-block bg-primary hover:bg-accent text-white font-medium px-10 py-5 rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-primary/20 active:scale-95 text-lg">
+              className="inline-block bg-primary hover:bg-accent text-white font-medium px-10 py-5 rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-primary/20 active:scale-95 text-lg"
+            >
               Create your memento
             </Link>
             <p className="mt-4 text-xs text-muted uppercase tracking-[0.2em] font-medium">
@@ -126,7 +127,8 @@ export default function Home() {
             {SHOWCASE_IMAGES.map((img, idx) => (
               <div
                 key={idx}
-                className={`absolute inset-0 transition-all duration-1000 ease-in-out ${idx === activeImage ? "opacity-100 scale-100" : "opacity-0 scale-105 pointer-events-none"}`}>
+                className={`absolute inset-0 transition-all duration-1000 ease-in-out ${idx === activeImage ? "opacity-100 scale-100" : "opacity-0 scale-105 pointer-events-none"}`}
+              >
                 <img
                   src={img.url}
                   alt={`Showcase ${idx + 1}`}
@@ -135,10 +137,11 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
                 <div className="absolute inset-0 flex items-center justify-center p-6">
                   <div
-                    className={`bg-white/10 backdrop-blur-md p-6 md:p-10 rounded-[2rem] border border-white/20 text-white text-center max-w-lg transition-all duration-700 delay-300 ${idx === activeImage ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
+                    className={`bg-white/10 backdrop-blur-md p-6 md:p-10 rounded-[2rem] border border-white/20 text-white text-center max-w-lg transition-all duration-700 delay-300 ${idx === activeImage ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+                  >
                     <Heart className="w-8 h-8 text-primary fill-current mx-auto mb-6" />
                     <p className="font-serif italic text-xl md:text-2xl leading-relaxed">
-                      "{img.quote}"
+                      &ldquo;{img.quote}&rdquo;
                     </p>
                   </div>
                 </div>
@@ -158,12 +161,14 @@ export default function Home() {
 
             <button
               onClick={prevImage}
-              className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20">
+              className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20"
+            >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20">
+              className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20"
+            >
               <ChevronRight className="w-6 h-6" />
             </button>
           </div>

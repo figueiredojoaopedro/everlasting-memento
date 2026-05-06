@@ -50,7 +50,7 @@ export function MemoryCard({ memory, isPrivate, onDelete }: MemoryCardProps) {
             </div>
             <div className="space-y-1">
               <span className="font-medium text-primary/70 block text-[10px] uppercase tracking-tighter">
-                Why it's meaningful
+                Why it&apos;s meaningful
               </span>
               <p className="text-sm">
                 {memory.meaning}

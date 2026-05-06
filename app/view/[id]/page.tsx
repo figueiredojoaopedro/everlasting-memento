@@ -17,9 +17,8 @@ export default function PublicMementoView() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id || !db) return;
-
     const fetchData = async () => {
+      if (!id || !db) return;
       try {
         const docRef = doc(db, 'mementos', id as string);
         const docSnap = await getDoc(docRef);
@@ -105,7 +104,7 @@ export default function PublicMementoView() {
           </div>
           {memento.whoIsThisFor && (
             <p className="text-xl md:text-2xl text-muted italic font-serif">
-              "Dedicated to {memento.whoIsThisFor}"
+              &ldquo;Dedicated to {memento.whoIsThisFor}&rdquo;
             </p>
           )}
         </div>
