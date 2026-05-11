@@ -1,38 +1,43 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #FAF7F2;
-  --color-foreground: #2B2B2B;
-  --color-primary: #E8A9A9;
-  --color-secondary: #F2E6D8;
-  --color-accent: #D98C8C;
-  --color-border: #EDE3D7;
-  --color-muted: #6B6B6B;
+    --color-background: #faf7f2;
+    --color-foreground: #2b2b2b;
+    --color-primary: #e8a9a9;
+    --color-secondary: #f2e6d8;
+    --color-accent: #d98c8c;
+    --color-border: #ede3d7;
+    --color-muted: #6b6b6b;
 
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-serif);
+    --font-sans: var(--font-inter);
+    --font-serif: var(--font-serif);
 }
 
 :root {
-  --background: #FAF7F2;
-  --foreground: #2B2B2B;
-  --primary: #E8A9A9;
-  --secondary: #F2E6D8;
-  --accent: #D98C8C;
-  --border: #EDE3D7;
-  --muted: #6B6B6B;
+    --background: #faf7f2;
+    --foreground: #2b2b2b;
+    --primary: #e8a9a9;
+    --secondary: #f2e6d8;
+    --accent: #d98c8c;
+    --border: #ede3d7;
+    --muted: #6b6b6b;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    background-color: var(--background);
+    /*color: var(--foreground);*/
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color: var(--foreground);
-}
+/*h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--foreground);
+}*/
 
 .font-serif {
-  font-family: var(--font-serif), ui-serif, Georgia, serif;
+    font-family: var(--font-serif), ui-serif, Georgia, serif;
 }

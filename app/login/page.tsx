@@ -1,89 +1,72 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { EmailAuthProvider, linkWithCredential } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useAuth } from "@/hooks/useAuth";
-import { Mail, Lock, ArrowLeft, Loader2, Heart, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowLeft, Loader2, Heart, LogIn } from "lucide-react";
 import Link from "next/link";
 
-function RegisterForm() {
-  const { user, loading: authLoading } = useAuth();
+function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const mementoId = searchParams.get("mementoId");
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !auth) return;
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+    if (!auth) return;
 
     setError("");
     setIsSubmitting(true);
 
     try {
-      const credential = EmailAuthProvider.credential(email, password);
-      await linkWithCredential(user, credential);
-      router.push(mementoId ? `/plans?mementoId=${mementoId}` : "/dashboard");
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/dashboard");
     } catch (err: unknown) {
       if (err instanceof Error) {
         const code = (err as { code?: string }).code;
-        if (code === "auth/email-already-in-use") {
-          setError("This email is already registered. Please sign in instead.");
-        } else if (code === "auth/weak-password") {
-          setError("Password must be at least 6 characters.");
+        if (code === "auth/user-not-found" || code === "auth/invalid-credential") {
+          setError("No account found with this email. Please register first.");
+        } else if (code === "auth/wrong-password") {
+          setError("Wrong password. Try again.");
+        } else if (code === "auth/invalid-email") {
+          setError("Invalid email address.");
         } else {
           setError(err.message);
         }
       } else {
-        setError("Registration failed. Please try again.");
+        setError("Login failed. Please try again.");
       }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (authLoading)
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-      </div>
-    );
-
   return (
     <div className="min-h-screen bg-background p-6 md:p-12 lg:p-24 flex flex-col">
       <div className="max-w-md mx-auto w-full flex-1 flex flex-col justify-center">
         <Link
-          href={mementoId ? "/create" : "/"}
+          href="/"
           className="inline-flex items-center text-muted hover:text-foreground mb-12 transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          {mementoId ? "Back" : "Home"}
+          Home
         </Link>
 
         <div className="mb-12 space-y-2 text-center">
           <div className="flex items-center justify-center space-x-2 text-primary mb-2">
             <Heart className="w-5 h-5 fill-current" />
             <span className="text-xs font-bold uppercase tracking-[0.2em]">
-              Almost there
+              Welcome back
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-medium">
-            Create your account
+            Sign in
           </h1>
           <p className="text-muted font-light text-lg">
-            Save your memento and choose how long it lasts.
+            Access your mementos and memories.
           </p>
         </div>
 
@@ -122,24 +105,7 @@ function RegisterForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-white border border-border/50 rounded-2xl p-5 text-lg focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm"
-              placeholder="At least 6 characters"
-              minLength={6}
-              required
-            />
-          </div>
-
-          <div className="space-y-3">
-            <label className="text-xs font-bold text-muted uppercase tracking-[0.2em] flex items-center">
-              <Lock className="w-3 h-3 mr-2" />
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full bg-white border border-border/50 rounded-2xl p-5 text-lg focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm"
-              placeholder="Repeat your password"
-              minLength={6}
+              placeholder="Your password"
               required
             />
           </div>
@@ -152,12 +118,12 @@ function RegisterForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin mr-3" />
-                Creating account...
+                Signing in...
               </>
             ) : (
               <>
-                <Sparkles className="w-5 h-5 mr-2" />
-                Continue
+                <LogIn className="w-5 h-5 mr-2" />
+                Sign in
               </>
             )}
           </button>
@@ -165,12 +131,12 @@ function RegisterForm() {
 
         <div className="mt-8 text-center">
           <p className="text-sm text-muted">
-            Already have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
-              href="/login"
+              href="/register"
               className="text-primary font-medium hover:underline"
             >
-              Sign in
+              Register
             </Link>
           </p>
         </div>
@@ -179,7 +145,7 @@ function RegisterForm() {
   );
 }
 
-export default function RegisterPage() {
+export default function LoginPage() {
   return (
     <Suspense
       fallback={
@@ -188,7 +154,7 @@ export default function RegisterPage() {
         </div>
       }
     >
-      <RegisterForm />
+      <LoginForm />
     </Suspense>
   );
 }
