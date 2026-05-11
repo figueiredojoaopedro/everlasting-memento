@@ -313,6 +313,10 @@ Speed > perfection
 
 If you hesitate adding something → don’t build it.
 
+### Commit Discipline
+
+After every feature or meaningful change, commit. Do not wait until the end of the day. This keeps the log clean and prevents loss of work. The user forgets to do this — you must not.
+
 ## 18. Mockup Page (`/mockup`)
 
 ### Purpose
