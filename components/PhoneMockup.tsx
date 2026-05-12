@@ -3,7 +3,11 @@
 import { useRef, useState, useCallback } from "react";
 import { MockupContent } from "@/components/MockupContent";
 
-export function PhoneMockup() {
+interface PhoneMockupProps {
+  showContent?: boolean;
+}
+
+export function PhoneMockup({ showContent = true }: PhoneMockupProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
 
@@ -14,14 +18,14 @@ export function PhoneMockup() {
   }, []);
 
   return (
-    <div className="shrink-0 mx-auto w-64 sm:w-80">
-      <div className="relative w-full" style={{ aspectRatio: "393/852" }}>
+    <div className="shrink-0 mx-auto w-72 sm:w-80">
+      <div className="relative w-full" style={{ aspectRatio: "9/19" }}>
         {/* Titanium frame */}
         <div className="absolute inset-0 rounded-[50px] bg-zinc-800 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_25px_70px_-15px_rgba(0,0,0,0.5)]" />
 
         {/* Screen */}
         <div className="absolute inset-[8px] rounded-[42px] bg-[#121212] overflow-hidden">
-          {/* Status bar + Dynamic Island */}
+          {/* Status bar */}
           <div className="absolute top-0 left-0 right-0 z-30 pointer-events-none flex items-center justify-between px-5 pt-[8px]">
             <span className="text-white font-semibold text-[11px] leading-none">
               9:41
@@ -45,20 +49,22 @@ export function PhoneMockup() {
             <div className="w-[76px] h-[25px] bg-black rounded-full" />
           </div>
 
-          {/* Scrollable content */}
-          <div
-            ref={scrollRef}
-            onScroll={handleScroll}
-            className="absolute inset-0 overflow-y-auto [&::-webkit-scrollbar]:hidden"
-            style={{
-              scrollbarWidth: "none",
-              overscrollBehavior: "contain",
-              touchAction: "pan-y",
-              WebkitOverflowScrolling: "touch",
-            }}
-          >
-            <MockupContent scrollY={scrollY} isCompact />
-          </div>
+          {/* Scrollable content — only when showContent is true */}
+          {showContent && (
+            <div
+              ref={scrollRef}
+              onScroll={handleScroll}
+              className="absolute inset-0 overflow-y-auto [&::-webkit-scrollbar]:hidden"
+              style={{
+                scrollbarWidth: "none",
+                overscrollBehavior: "contain",
+                touchAction: "pan-y",
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
+              <MockupContent scrollY={scrollY} isCompact />
+            </div>
+          )}
 
           {/* Home indicator */}
           <div className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-white/30 rounded-full z-30 pointer-events-none" />

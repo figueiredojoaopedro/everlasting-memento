@@ -1,15 +1,22 @@
+"use client";
+
 import { Sparkles, Shield, Share2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function FeatureGrid() {
+  const { t } = useLanguage();
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-24 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
       <div className="space-y-4">
         <div className="w-12 h-12 bg-secondary/50 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Sparkles className="w-6 h-6 text-primary" />
         </div>
-        <h3 className="text-xl font-serif font-medium">Emotional Focus</h3>
+        <h3 className="text-xl font-serif font-medium">
+          {t("feature.emotional.title")}
+        </h3>
         <p className="text-muted text-sm leading-relaxed font-light">
-          Not just photos. Turn your moments into a story that lives on.
+          {t("feature.emotional.description")}
         </p>
       </div>
       <div className="space-y-4">
@@ -17,11 +24,10 @@ export function FeatureGrid() {
           <Shield className="w-6 h-6 text-primary" />
         </div>
         <h3 className="text-xl font-serif font-medium">
-          Private by Default
+          {t("feature.private.title")}
         </h3>
         <p className="text-muted text-sm leading-relaxed font-light">
-          Your memento is private. You decide when and who to share it with.
-          No social media noise.
+          {t("feature.private.description")}
         </p>
       </div>
       <div className="space-y-4">
@@ -29,11 +35,10 @@ export function FeatureGrid() {
           <Share2 className="w-6 h-6 text-primary" />
         </div>
         <h3 className="text-xl font-serif font-medium">
-          Beautiful Sharing
+          {t("feature.sharing.title")}
         </h3>
         <p className="text-muted text-sm leading-relaxed font-light">
-          Share a clean, read-only timeline that looks like a digital art
-          gallery of your moments.
+          {t("feature.sharing.description")}
         </p>
       </div>
     </div>

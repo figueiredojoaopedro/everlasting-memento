@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const FLOATING_EMOJIS = [
   { emoji: "📖", x: "15%", y: "10%", delay: "0s", size: "text-3xl" },
@@ -11,6 +14,8 @@ const FLOATING_EMOJIS = [
 ];
 
 export function HeroSection() {
+  const { t } = useLanguage();
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-12 md:py-24 text-center space-y-8">
       <style>{`
@@ -40,12 +45,11 @@ export function HeroSection() {
         ))}
 
         <h1 className="my-16 md:my-8 text-6xl md:text-8xl font-serif font-medium tracking-tight text-foreground leading-[1.1]">
-          Turn your moments into a, <br />
-          <span className="text-primary italic"> story that lasts...</span>
+          {t("hero.headline1")} <br />
+          <span className="text-primary italic">{t("hero.headline2")}</span>
         </h1>
         <p className="text-xl md:text-2xl text-muted font-light max-w-xl mx-auto leading-relaxed">
-          Create beautiful private pages with photos, stories, voice notes and
-          moments you never want to lose.
+          {t("hero.subtext")}
         </p>
       </div>
 
@@ -54,10 +58,10 @@ export function HeroSection() {
           href="/create"
           className="inline-block bg-primary hover:bg-accent text-white font-medium px-10 py-5 rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-primary/20 active:scale-95 text-lg"
         >
-          Build your story
+          {t("hero.cta")}
         </Link>
         <p className="mt-4 text-xs text-muted uppercase tracking-[0.2em] font-medium">
-          It only takes a minute
+          {t("hero.tagline")}
         </p>
         <div
           className="mt-10 flex justify-center w-auto"
