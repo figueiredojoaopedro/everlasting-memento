@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Loader2, Heart, Check, Sparkles, Clock } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Loader2, Heart, Check, Sparkles, Clock } from "lucide-react";
 import Link from "next/link";
 
 const PLANS = [
@@ -25,53 +25,39 @@ const PLANS = [
   },
 ];
 
-function PlansForm() {
-  const searchParams = useSearchParams();
-  const mementoId = searchParams.get("mementoId");
+export default function PlansPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
-  const [error, setError] = useState("");
 
   const handleSelectPlan = async (planId: string) => {
     setLoading(planId);
-    setError("");
 
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          plan: planId,
-          mementoId,
-          returnUrl: `${window.location.origin}/plans?mementoId=${mementoId}`,
-        }),
-      });
+    // TODO: Integrate Stripe payment here
+    // const res = await fetch("/api/create-checkout", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ plan: planId }),
+    // });
+    // const { url } = await res.json();
+    // window.location.replace(url);
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create checkout");
-
-      window.location.replace(data.url);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Something went wrong. Try again.",
-      );
-      setLoading(null);
-    }
+    // For now, redirect straight to create after plan selection
+    setTimeout(() => {
+      router.push("/create");
+    }, 500);
   };
-
-  if (!mementoId) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background p-6 text-center">
-        <h2 className="text-2xl font-serif mb-4">No memento found</h2>
-        <Link href="/" className="bg-primary text-white px-8 py-3 rounded-full">
-          Go Home
-        </Link>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background p-6 md:p-12 lg:p-24 flex flex-col">
       <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col justify-center">
+        <Link
+          href="/"
+          className="inline-flex items-center text-muted hover:text-foreground mb-12 transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+          Home
+        </Link>
+
         <div className="mb-12 space-y-2 text-center">
           <div className="flex items-center justify-center space-x-2 text-primary mb-2">
             <Heart className="w-5 h-5 fill-current" />
@@ -87,12 +73,6 @@ function PlansForm() {
             visible.
           </p>
         </div>
-
-        {error && (
-          <div className="max-w-md mx-auto w-full mb-6 bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-2xl text-sm text-center">
-            {error}
-          </div>
-        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto w-full">
           {PLANS.map((plan) => {
@@ -172,23 +152,9 @@ function PlansForm() {
         </div>
 
         <p className="text-center text-[10px] text-muted/40 uppercase tracking-[0.3em] mt-12">
-          Secure payment via AbacatePay
+          Secure payment via Stripe
         </p>
       </div>
     </div>
-  );
-}
-
-export default function PlansPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
-        </div>
-      }
-    >
-      <PlansForm />
-    </Suspense>
   );
 }

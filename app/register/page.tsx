@@ -1,18 +1,14 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { EmailAuthProvider, linkWithCredential } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useAuth } from "@/hooks/useAuth";
 import { Mail, Lock, ArrowLeft, Loader2, Heart, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 function RegisterForm() {
-  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const mementoId = searchParams.get("mementoId");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +18,7 @@ function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !auth) return;
+    if (!auth) return;
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -33,9 +29,8 @@ function RegisterForm() {
     setIsSubmitting(true);
 
     try {
-      const credential = EmailAuthProvider.credential(email, password);
-      await linkWithCredential(user, credential);
-      router.push(mementoId ? `/plans?mementoId=${mementoId}` : "/dashboard");
+      await createUserWithEmailAndPassword(auth, email, password);
+      router.push("/plans");
     } catch (err: unknown) {
       if (err instanceof Error) {
         const code = (err as { code?: string }).code;
@@ -54,36 +49,29 @@ function RegisterForm() {
     }
   };
 
-  if (authLoading)
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-      </div>
-    );
-
   return (
     <div className="min-h-screen bg-background p-6 md:p-12 lg:p-24 flex flex-col">
       <div className="max-w-md mx-auto w-full flex-1 flex flex-col justify-center">
         <Link
-          href={mementoId ? "/create" : "/"}
+          href="/"
           className="inline-flex items-center text-muted hover:text-foreground mb-12 transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          {mementoId ? "Back" : "Home"}
+          Home
         </Link>
 
         <div className="mb-12 space-y-2 text-center">
           <div className="flex items-center justify-center space-x-2 text-primary mb-2">
             <Heart className="w-5 h-5 fill-current" />
             <span className="text-xs font-bold uppercase tracking-[0.2em]">
-              Almost there
+              Get started
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-medium">
             Create your account
           </h1>
           <p className="text-muted font-light text-lg">
-            Save your memento and choose how long it lasts.
+            Register to create and share your mementos.
           </p>
         </div>
 
@@ -157,7 +145,7 @@ function RegisterForm() {
             ) : (
               <>
                 <Sparkles className="w-5 h-5 mr-2" />
-                Continue
+                Create account
               </>
             )}
           </button>

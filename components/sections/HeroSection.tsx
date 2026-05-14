@@ -55,7 +55,7 @@ export function HeroSection() {
 
       <div className="pt-10">
         <Link
-          href="/create"
+          href="/register"
           className="inline-block bg-primary hover:bg-accent text-white font-medium px-10 py-5 rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-primary/20 active:scale-95 text-lg"
         >
           {t("hero.cta")}

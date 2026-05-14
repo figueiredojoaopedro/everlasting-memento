@@ -28,7 +28,7 @@ export function HowItWorks() {
   const { t } = useLanguage();
 
   return (
-    <div className="w-full py-24 md:py-32">
+    <div className="w-full py-12 md:py-16">
       <div className="max-w-5xl mx-auto px-6">
         <div className="text-center mb-16 md:mb-20 space-y-4">
           <h2 className="text-4xl md:text-5xl font-serif font-medium text-foreground leading-tight">

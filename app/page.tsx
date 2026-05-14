@@ -7,7 +7,6 @@ import { HowItWorks } from "@/components/sections/HowItWorks";
 import { TestimonialSection } from "@/components/sections/TestimonialSection";
 import { PricingSection } from "@/components/sections/PricingSection";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
-import { ShowcaseCarousel } from "@/components/sections/ShowcaseCarousel";
 import { FooterSection } from "@/components/sections/FooterSection";
 
 export default function Home() {
