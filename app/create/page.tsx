@@ -1,20 +1,28 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
-import { useAuth } from '@/hooks/useAuth';
-import { Camera, Calendar, User, ArrowLeft, Loader2, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { collection, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { signInAnonymously } from "firebase/auth";
+import { auth, db, storage } from "@/lib/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  Camera,
+  Calendar,
+  User,
+  ArrowLeft,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
+import Link from "next/link";
 
 export default function CreateMemento() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [title, setTitle] = useState('Our Story');
-  const [date, setDate] = useState('');
-  const [whoIsThisFor, setWhoIsThisFor] = useState('');
+  const [title, setTitle] = useState("Our Story");
+  const [date, setDate] = useState("");
+  const [whoIsThisFor, setWhoIsThisFor] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,22 +41,42 @@ export default function CreateMemento() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !db || !storage) {
-      alert('Firebase is not configured. Please check your environment variables.');
+
+    let currentUser = user;
+
+    if (!currentUser && auth) {
+      try {
+        const cred = await signInAnonymously(auth);
+        currentUser = cred.user;
+      } catch {
+        alert(
+          "Failed to start anonymous session. Please check your Firebase configuration.",
+        );
+        return;
+      }
+    }
+
+    if (!currentUser || !db || !storage) {
+      alert(
+        "Firebase is not configured. Please check your environment variables.",
+      );
       return;
     }
 
     setIsSubmitting(true);
     try {
-      let coverImageUrl = '';
+      let coverImageUrl = "";
       if (image) {
-        const storageRef = ref(storage, `mementos/${user.uid}/${Date.now()}-${image.name}`);
+        const storageRef = ref(
+          storage,
+          `mementos/${currentUser.uid}/${Date.now()}-${image.name}`,
+        );
         const snapshot = await uploadBytes(storageRef, image);
         coverImageUrl = await getDownloadURL(snapshot.ref);
       }
 
       const mementoData = {
-        userId: user.uid,
+        userId: currentUser.uid,
         title,
         date,
         whoIsThisFor,
@@ -56,26 +84,30 @@ export default function CreateMemento() {
         createdAt: Date.now(),
       };
 
-      const docRef = await addDoc(collection(db, 'mementos'), mementoData);
+      const docRef = await addDoc(collection(db, "mementos"), mementoData);
       router.push(`/register?mementoId=${docRef.id}`);
     } catch (error) {
-      console.error('Error creating memento:', error);
-      alert('Failed to create memento. Please try again.');
+      console.error("Error creating memento:", error);
+      alert("Failed to create memento. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (authLoading) return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-      <Loader2 className="w-8 h-8 text-primary animate-spin" />
-    </div>
-  );
+  if (authLoading)
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-background p-6 md:p-12 lg:p-24">
       <div className="max-w-2xl mx-auto">
-        <Link href="/" className="inline-flex items-center text-muted hover:text-foreground mb-12 transition-colors group">
+        <Link
+          href="/"
+          className="inline-flex items-center text-muted hover:text-foreground mb-12 transition-colors group"
+        >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           Back to start
         </Link>
@@ -83,15 +115,26 @@ export default function CreateMemento() {
         <div className="mb-12 space-y-2">
           <div className="flex items-center space-x-2 text-primary mb-2">
             <Sparkles className="w-5 h-5" />
-            <span className="text-xs font-bold uppercase tracking-[0.2em]">New Journey</span>
+            <span className="text-xs font-bold uppercase tracking-[0.2em]">
+              New Journey
+            </span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-serif font-medium">Create your space</h1>
-          <p className="text-muted font-light text-lg">Every great story begins with a single moment.</p>
+          <h1 className="text-4xl md:text-5xl font-serif font-medium">
+            Create your space
+          </h1>
+          <p className="text-muted font-light text-lg">
+            Every great story begins with a single moment.
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-10 bg-white/50 p-8 md:p-12 rounded-[2.5rem] border border-border/50 shadow-sm">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-10 bg-white/50 p-8 md:p-12 rounded-[2.5rem] border border-border/50 shadow-sm"
+        >
           <div className="space-y-4">
-            <label className="text-xs font-bold text-muted uppercase tracking-[0.2em]">What is this story called?</label>
+            <label className="text-xs font-bold text-muted uppercase tracking-[0.2em]">
+              What is this story called?
+            </label>
             <input
               type="text"
               value={title}
@@ -135,15 +178,21 @@ export default function CreateMemento() {
               <Camera className="w-3 h-3 mr-2" />
               Cover Image
             </label>
-            <div 
-              className={`relative border-2 border-dashed border-border/50 rounded-[2rem] h-64 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all hover:border-primary bg-white/50 group ${imagePreview ? 'border-none shadow-xl' : ''}`}
-              onClick={() => document.getElementById('image-upload')?.click()}
+            <div
+              className={`relative border-2 border-dashed border-border/50 rounded-[2rem] h-64 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all hover:border-primary bg-white/50 group ${imagePreview ? "border-none shadow-xl" : ""}`}
+              onClick={() => document.getElementById("image-upload")?.click()}
             >
               {imagePreview ? (
                 <>
-                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p className="text-white font-medium px-6 py-2 border border-white/30 rounded-full backdrop-blur-md">Change image</p>
+                    <p className="text-white font-medium px-6 py-2 border border-white/30 rounded-full backdrop-blur-md">
+                      Change image
+                    </p>
                   </div>
                 </>
               ) : (
@@ -152,7 +201,9 @@ export default function CreateMemento() {
                     <Camera className="w-6 h-6" />
                   </div>
                   <p className="text-muted font-medium">Upload a cover photo</p>
-                  <p className="text-[10px] text-muted/60 uppercase tracking-widest">Something that represents this story</p>
+                  <p className="text-[10px] text-muted/60 uppercase tracking-widest">
+                    Something that represents this story
+                  </p>
                 </div>
               )}
               <input

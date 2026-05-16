@@ -1,8 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Heart, Check, Sparkles, Clock } from "lucide-react";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import {
+  ArrowLeft,
+  Loader2,
+  Heart,
+  Check,
+  Sparkles,
+  Clock,
+} from "lucide-react";
 import Link from "next/link";
 
 const PLANS = [
@@ -13,6 +22,7 @@ const PLANS = [
     description: "Perfect for a short-term tribute",
     duration: "Lasts 1 week",
     icon: Clock,
+    durationMs: 7 * 24 * 60 * 60 * 1000,
   },
   {
     id: "yearly" as const,
@@ -22,30 +32,64 @@ const PLANS = [
     duration: "Lasts 1 year",
     icon: Sparkles,
     featured: true,
+    durationMs: 365 * 24 * 60 * 60 * 1000,
   },
 ];
 
-export default function PlansPage() {
+function PlansForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const mementoId = searchParams.get("mementoId");
   const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
   const handleSelectPlan = async (planId: string) => {
+    if (!mementoId || !db) return;
+
     setLoading(planId);
+    setError("");
 
-    // TODO: Integrate Stripe payment here
-    // const res = await fetch("/api/create-checkout", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ plan: planId }),
-    // });
-    // const { url } = await res.json();
-    // window.location.replace(url);
+    try {
+      const plan = PLANS.find((p) => p.id === planId);
+      if (!plan) throw new Error("Invalid plan");
 
-    // For now, redirect straight to create after plan selection
-    setTimeout(() => {
-      router.push("/create");
-    }, 500);
+      // TODO: Integrate Stripe payment here
+      // const res = await fetch("/api/create-checkout", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ plan: planId, mementoId }),
+      // });
+      // const { url } = await res.json();
+      // window.location.replace(url);
+
+      // For MVP: update the memento directly
+      await updateDoc(doc(db, "mementos", mementoId), {
+        plan: planId,
+        expiresAt: Date.now() + plan.durationMs,
+      });
+
+      router.push(`/m/${mementoId}`);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Something went wrong. Try again.",
+      );
+      setLoading(null);
+    }
   };
+
+  if (!mementoId) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background p-6 text-center">
+        <h2 className="text-2xl font-serif mb-4">No memento found</h2>
+        <Link
+          href="/"
+          className="bg-primary text-white px-8 py-3 rounded-full"
+        >
+          Go Home
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-6 md:p-12 lg:p-24 flex flex-col">
@@ -73,6 +117,12 @@ export default function PlansPage() {
             visible.
           </p>
         </div>
+
+        {error && (
+          <div className="max-w-md mx-auto w-full mb-6 bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-2xl text-sm text-center">
+            {error}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto w-full">
           {PLANS.map((plan) => {
@@ -139,7 +189,7 @@ export default function PlansPage() {
                     {isSelected ? (
                       <span className="flex items-center justify-center">
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Redirecting...
+                        Processing...
                       </span>
                     ) : (
                       `Choose ${plan.name}`
@@ -156,5 +206,19 @@ export default function PlansPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function PlansPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        </div>
+      }
+    >
+      <PlansForm />
+    </Suspense>
   );
 }
